@@ -7,11 +7,16 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from "@nestjs/common";
+import { ApiConsumes, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
-import { ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { imageUploadOptions } from "../../../framework/utils";
+
 
 @ApiTags("Product")
 @ApiResponse({
@@ -26,6 +31,8 @@ import { ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image', imageUploadOptions))
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: "The record has been successfully created.",
@@ -35,7 +42,10 @@ export class ProductController {
     description: "Bad request",
   })
   @Post()
-  async create(@Body() createProductDto: CreateProductDto) {
+  async create(@Body() createProductDto: CreateProductDto, @UploadedFile() file: Express.Multer.File) {
+    if (file) {
+      createProductDto.image = `/uploads/${file.filename}`;
+    }
     return await this.productService.create(createProductDto);
   }
 

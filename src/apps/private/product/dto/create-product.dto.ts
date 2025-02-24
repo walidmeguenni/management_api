@@ -17,7 +17,7 @@ export class CreateProductDto {
 
   @ApiProperty({ example: 1500.99, description: 'The price of the product' })
   @IsNumber()
-  @Min(0)
+  @Transform(({ value }) => parseFloat(value))
   price: number;
 
   @ApiProperty({ example: 'Electronics', description: 'Category the product belongs to' })
@@ -26,9 +26,8 @@ export class CreateProductDto {
   @Transform(({ value }) => value.trim())
   category: string;
 
-  @ApiProperty({ example: 'https://example.com/image.jpg', description: 'URL of the product image' })
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @IsOptional()
   @IsString()
-  @MaxLength(255)
-  @Transform(({ value }) => value.trim())
   image: string;
 }

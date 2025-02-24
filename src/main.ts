@@ -5,6 +5,8 @@ import { AppModule } from "./apps/app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "./framework/utils";
 import { ValidationPipe } from "@nestjs/common";
+import { join } from "path";
+import * as express from "express";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,12 +14,13 @@ async function bootstrap() {
   const port = process.env.PORT || 4000;
   const apiPrefix = "api/v1";
 
+  app.use("/uploads", express.static(join(__dirname, "..", "uploads")));
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
     })
   );
-
   app.setGlobalPrefix(apiPrefix);
   app.enableCors();
   const config = new DocumentBuilder()
