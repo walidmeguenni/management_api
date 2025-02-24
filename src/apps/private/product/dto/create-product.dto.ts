@@ -16,9 +16,13 @@ export class CreateProductDto {
   description: string;
 
   @ApiProperty({ example: 1500.99, description: 'The price of the product' })
-  @IsNumber()
-  @Transform(({ value }) => parseFloat(value))
+  @Transform(({ value }) => {
+    if (value === undefined || value === '') return undefined;
+    return typeof value === 'string' ? parseFloat(value) : value;
+  })
+  @IsNumber({}, { message: 'Price must be a valid number' })
   price: number;
+
 
   @ApiProperty({ example: 'Electronics', description: 'Category the product belongs to' })
   @IsString()
