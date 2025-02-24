@@ -16,12 +16,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: housing-backend-dev
+    container_name: management_app
     restart: unless-stopped
     ports:
       - "4000:4000"
     env_file:
-      - .env.dev
+      - .env
     depends_on:
       - postgres
    
