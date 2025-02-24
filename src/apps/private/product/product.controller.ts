@@ -80,11 +80,31 @@ export class ProductController {
     schema: {
       type: 'object',
       properties: {
-        name: { type: 'string' },
-        description: { type: 'string' },
-        price: { type: 'number' },
-        category: { type: 'string' },
-        image: { type: 'string', format: 'binary' },
+        name: { 
+          type: 'string',
+          example: 'MacBook Pro',
+          description: 'Product name'
+        },
+        description: { 
+          type: 'string',
+          example: 'High-performance laptop with Retina display',
+          description: 'Detailed product description'
+        },
+        price: { 
+          type: 'number',
+          example: 1999.99,
+          description: 'Product price in dollars'
+        },
+        category: { 
+          type: 'string',
+          example: 'Electronics',
+          description: 'Product category'
+        },
+        image: { 
+          type: 'string', 
+          format: 'binary',
+          description: 'Product image file'
+        },
       },
     },
   })
