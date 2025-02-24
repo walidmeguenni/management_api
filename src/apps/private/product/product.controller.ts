@@ -10,18 +10,17 @@ import {
   UseInterceptors,
   UploadedFile,
 } from "@nestjs/common";
-import { ApiConsumes, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiConsumes, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
 import { imageUploadOptions } from "../../../framework/utils";
 
-
 @ApiTags("Product")
 @ApiResponse({
   status: HttpStatus.NOT_FOUND,
-  description: "DPCA not found",
+  description: "product not found",
 })
 @ApiResponse({
   status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -31,8 +30,9 @@ import { imageUploadOptions } from "../../../framework/utils";
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('image', imageUploadOptions))
+  @Post()
+  @ApiConsumes("multipart/form-data")
+  @UseInterceptors(FileInterceptor("image", imageUploadOptions))
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: "The record has been successfully created.",
@@ -41,23 +41,26 @@ export class ProductController {
     status: HttpStatus.BAD_REQUEST,
     description: "Bad request",
   })
-  @Post()
-  async create(@Body() createProductDto: CreateProductDto, @UploadedFile() file: Express.Multer.File) {
+  async create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFile() file: Express.Multer.File
+  ) {
     if (file) {
       createProductDto.image = `/uploads/${file.filename}`;
     }
     return await this.productService.create(createProductDto);
   }
-
+  
+  @Get()
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The records have been successfully fetched.",
   })
-  @Get()
   async findAll() {
     return await this.productService.findAll();
   }
-
+  
+  @Get(":id")
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully fetched.",
@@ -67,11 +70,25 @@ export class ProductController {
     description: "the identifier of the product",
     example: 1,
   })
-  @Get(":id")
   async findOne(@Param("id") id: string) {
     return await this.productService.findOne(+id);
   }
 
+  @Patch(":id")
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        price: { type: 'number' },
+        category: { type: 'string' },
+        image: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor("image", imageUploadOptions))
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully updated.",
@@ -81,11 +98,18 @@ export class ProductController {
     description: "the identifier of the product",
     example: 1,
   })
-  @Patch(":id")
-  async update(@Param("id") id: string, @Body() updateProductDto: UpdateProductDto) {
+  async update(
+    @Param("id") id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    if (file) {
+      updateProductDto.image = `/uploads/${file.filename}`;
+    }
     return await this.productService.update(+id, updateProductDto);
   }
-
+  
+  @Delete(":id")
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully deleted.",
@@ -95,7 +119,6 @@ export class ProductController {
     description: "the identifier of the product",
     example: 1,
   })
-  @Delete(":id")
   async remove(@Param("id") id: string) {
     return await this.productService.remove(+id);
   }
