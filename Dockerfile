@@ -1,15 +1,10 @@
-FROM node:20.13.0-alpine3.18 as base
+FROM node:20.17.0
 WORKDIR /app
-
-RUN apk add --no-cache 
-
-COPY package.*json ./
-RUN npm i --legacy-peer-deps
-
+COPY package*.json ./
+RUN npm install
 COPY . .
-
-EXPOSE 8000
-
-FROM base AS dev
-CMD [ "npm", "run", "start" ]
-
+RUN npx prisma generate
+COPY start.sh .
+RUN chmod +x start.sh
+EXPOSE 4000 
+CMD ["./start.sh"]
