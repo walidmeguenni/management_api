@@ -66,7 +66,7 @@ To access the API, use the following default credentials for authentication:
 ### Store Owner
 ```yaml
 Email: john_doe@example.com
-Password: password123
+Password: password123456
 ```
 
 ### Guest User
