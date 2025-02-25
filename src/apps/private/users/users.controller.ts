@@ -16,14 +16,17 @@ import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get()
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The records have been successfully fetched.",
   })
-  @Get()
   async findAll() {
     return await this.usersService.findAll();
   }
+
+  @Get(':id')
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully fetched.",
@@ -33,10 +36,11 @@ export class UsersController {
     description: "the identifier of the user",
     example: 1,
   })
-  @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.usersService.findOne(+id);
   }
+
+  @Patch(':id')
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully updated.",
@@ -50,13 +54,17 @@ export class UsersController {
     description: "the identifier of the user",
     example: 1,
   })
-  @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "The record has been successfully deleted.",
+  })
+ 
+  async remove(@Param('id') id: string) {
+    return await this.usersService.remove(+id);
   }
 }

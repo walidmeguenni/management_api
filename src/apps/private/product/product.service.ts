@@ -103,6 +103,15 @@ export class ProductService {
 
   async remove(id: number) {
     try {
+      const existingProduct = await this.prismaService.product.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      if (!existingProduct) {
+        throw new NotFoundException(`Product with id ${id} not found`);
+      }
+
       const result = await this.prismaService.product.delete({
         where: {
           id: id,
@@ -117,9 +126,6 @@ export class ProductService {
       };
     } catch (error: any) {
       console.error("Error in ProductService::remove", error);
-      if (error.code === "P2025") {
-        throw new NotFoundException(`Product with id ${id} not found`);
-      }
       throw error;
     }
   }
