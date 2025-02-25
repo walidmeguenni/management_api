@@ -14,10 +14,6 @@ export class CreateUserDto {
 
   @ApiProperty({ example: 'securepassword123', description: 'The password of the user' })
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   password: string;
-
-  @ApiProperty({ example: Role.USER, description: 'The role of the user', enum: Role })
-  @IsEnum(Role)
-  role: Role;
 }

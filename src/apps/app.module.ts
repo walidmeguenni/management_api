@@ -1,27 +1,33 @@
-import { JwtModule } from '@nestjs/jwt';
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
-import { RouterModule } from '@nestjs/core';
-import { PublicModule } from './public/public.module';
-import { PrivateModule } from './private/private.module';
+import { JwtModule } from "@nestjs/jwt";
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from "@nestjs/common";
+import { RouterModule } from "@nestjs/core";
+import { PublicModule } from "./public/public.module";
+import { PrivateModule } from "./private/private.module";
+import { JwtMiddleware } from "../framework/jwt/jwt.middleware";
 
 @Module({
   imports: [
     PublicModule,
     PrivateModule,
     JwtModule.register({
-      secret: process.env.ACCESS_TOKEN_SECRET,
-      signOptions: { expiresIn: '1d' },
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: "1d" },
     }),
     RouterModule.register([
       {
-        path: '',
+        path: "",
         children: [
           {
-            path: '/',
+            path: "/",
             module: PublicModule,
           },
           {
-            path: '/private',
+            path: "/private",
             module: PrivateModule,
           },
         ],
@@ -31,4 +37,13 @@ import { PrivateModule } from './private/private.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtMiddleware)
+      .exclude(
+        { path: "private/product", method: RequestMethod.GET }
+      )
+      .forRoutes({ path: "*", method: RequestMethod.ALL });
+  }
+}

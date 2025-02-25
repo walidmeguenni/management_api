@@ -9,13 +9,17 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiBody, ApiConsumes, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
 import { imageUploadOptions } from "../../../framework/utils";
+import { Roles } from "../../../framework/decorators/roles.decorator";
+import { Role } from "../../../framework/enums/role.enum";
+import { RolesGuard } from "../../public/auth/guard/auth.guard";
 
 @ApiTags("Product")
 @ApiResponse({
@@ -26,6 +30,7 @@ import { imageUploadOptions } from "../../../framework/utils";
   status: HttpStatus.INTERNAL_SERVER_ERROR,
   description: "Internal server error",
 })
+@ApiBearerAuth()
 @Controller("product")
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -41,6 +46,8 @@ export class ProductController {
     status: HttpStatus.BAD_REQUEST,
     description: "Bad request",
   })
+  @Roles(Role.OWNER)
+  @UseGuards(RolesGuard)
   async create(
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() file: Express.Multer.File
@@ -56,6 +63,7 @@ export class ProductController {
     status: HttpStatus.OK,
     description: "The records have been successfully fetched.",
   })
+
   async findAll() {
     return await this.productService.findAll();
   }
@@ -70,6 +78,8 @@ export class ProductController {
     description: "the identifier of the product",
     example: 1,
   })
+  @Roles(Role.OWNER, Role.USER)
+  @UseGuards(RolesGuard)
   async findOne(@Param("id") id: string) {
     return await this.productService.findOne(+id);
   }
@@ -118,6 +128,8 @@ export class ProductController {
     description: "the identifier of the product",
     example: 1,
   })
+  @Roles(Role.OWNER)
+  @UseGuards(RolesGuard)
   async update(
     @Param("id") id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -139,6 +151,8 @@ export class ProductController {
     description: "the identifier of the product",
     example: 1,
   })
+  @Roles(Role.OWNER)
+  @UseGuards(RolesGuard)
   async remove(@Param("id") id: string) {
     return await this.productService.remove(+id);
   }

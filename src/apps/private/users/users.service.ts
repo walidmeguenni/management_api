@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { PrismaService } from "../../../framework/prisma/prisma.service";
 
@@ -53,7 +54,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
-      const { username, email } = updateUserDto;
+      const { username, email, password } = updateUserDto;
       const existingUser = await this.prismaService.user.findUnique({
         where: {
           id: id,
@@ -86,6 +87,11 @@ export class UsersService {
         }
       }
 
+      if (password) {
+        const salt = bcrypt.genSaltSync(10);
+        updateUserDto.password = bcrypt.hashSync(password, salt);
+      }
+      
       const result = await this.prismaService.user.update({
         where: {
           id: id,

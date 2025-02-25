@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  UseGuards,
+} from "@nestjs/common";
+import { UsersService } from "./users.service";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Roles } from "../../../framework/decorators/roles.decorator";
+import { RolesGuard } from "../../public/auth/guard/auth.guard";
+import { Role } from "../../../framework/enums/role.enum";
 
-@ApiTags('Users')
+@ApiTags("Users")
 @ApiResponse({
   status: HttpStatus.NOT_FOUND,
   description: "user not found",
@@ -13,7 +24,8 @@ import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
   status: HttpStatus.INTERNAL_SERVER_ERROR,
   description: "Internal server error",
 })
-@Controller('users')
+@ApiBearerAuth()
+@Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -22,11 +34,13 @@ export class UsersController {
     status: HttpStatus.OK,
     description: "The records have been successfully fetched.",
   })
+  @Roles(Role.OWNER)
+  @UseGuards(RolesGuard)
   async findAll() {
     return await this.usersService.findAll();
   }
 
-  @Get(':id')
+  @Get(":id")
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully fetched.",
@@ -36,11 +50,13 @@ export class UsersController {
     description: "the identifier of the user",
     example: 1,
   })
-  async findOne(@Param('id') id: string) {
+  @Roles(Role.OWNER, Role.USER)
+  @UseGuards(RolesGuard)
+  async findOne(@Param("id") id: string) {
     return await this.usersService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully updated.",
@@ -54,17 +70,20 @@ export class UsersController {
     description: "the identifier of the user",
     example: 1,
   })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Roles(Role.USER, Role.OWNER)
+  @UseGuards(RolesGuard)
+  async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The record has been successfully deleted.",
   })
- 
-  async remove(@Param('id') id: string) {
+  @Roles(Role.OWNER, Role.USER)
+  @UseGuards(RolesGuard)
+  async remove(@Param("id") id: string) {
     return await this.usersService.remove(+id);
   }
 }
