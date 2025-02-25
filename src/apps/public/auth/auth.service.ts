@@ -53,14 +53,12 @@ export class AuthService {
         where: { email: data.email },
       });
 
-      if (!user) {
-        throw new NotFoundException("User not found");
-      }
+      const isPasswordValid = bcrypt.compareSync(data.password, (user && user.password) ?? "");
 
-      const isPasswordValid = bcrypt.compareSync(data.password, user.password);
-      if (!isPasswordValid) {
+      if (!user || !isPasswordValid) {
         throw new UnauthorizedException("Invalid credentials");
       }
+
 
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
