@@ -33,5 +33,9 @@ export class CreateProductDto {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   @IsOptional()
   @IsString()
+  @Transform(({ value }) => {
+    if (value === undefined || value === '') return undefined;
+    return value;
+  })
   image: string;
 }
