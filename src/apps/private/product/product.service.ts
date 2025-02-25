@@ -29,9 +29,14 @@ export class ProductService {
     }
   }
 
-  async findAll() {
+  async findAll(category?: string, sort?: 'asc' | 'desc') {
     try {
-      const result = await this.prismaService.product.findMany();
+      const where = category ? { category } : {};
+      const orderBy = sort ? { price: sort } : undefined;
+      const result = await this.prismaService.product.findMany({
+        where,
+        orderBy,
+      });
       if (!result) {
         return {
           status: false,

@@ -10,8 +10,9 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  Query,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -59,13 +60,15 @@ export class ProductController {
   }
   
   @Get()
+  @ApiQuery({ name: 'category', required: false, description: 'Filter by product category' })
+  @ApiQuery({ name: 'sort', required: false, enum: ['asc', 'desc'], description: 'Sort by price: ascending or descending' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: "The records have been successfully fetched.",
   })
 
-  async findAll() {
-    return await this.productService.findAll();
+  async findAll(@Query('category') category?: string, @Query('sort') sort?: 'asc' | 'desc') {
+    return await this.productService.findAll(category, sort);
   }
   
   @Get(":id")
