@@ -11,7 +11,7 @@ import * as express from "express";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || 8000;
   const apiPrefix = "api/v1";
 
   app.use("/uploads", express.static(join(__dirname, "..", "uploads")));
