@@ -1,13 +1,13 @@
-# Investement API
+# Temtem One-Backend API
 
-This project is a RESTful API built with NestJS and MongoDB to help Create project for investor.
+This project is a RESTful API built with NestJS and MongoDB for managing products and user authentication with role-based access control.
 
 ## Technologies Used
 
 - NestJS
-- MongoDB
+- PostgreSQL
 - npm (Package manager)
-- Docker (for MongoDB)
+- Docker
 
 ## Prerequisites
 
@@ -18,97 +18,77 @@ This project is a RESTful API built with NestJS and MongoDB to help Create proje
 ## Installation
 
 1. Clone the repository:
-   ```
-   git clone https://github.com/walidmeguenni/test_dev.git
-   cd test_dev
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Set up your environment variables:
-   Create a `.env.dev` file in the root directory and add the following variables:
-
-   ```
-   # Server Setup 
-   PORT=8000
-
-   # JWT Auth 
-   ACCESS_TOKEN_SECRET=your_jwt_secret_here
-
-   # DataBase URL
-   MONGO_DB_URI=mongodb://username:your_password_here@localhost:27017/db_name
-## Running the Application
-
-To run the application locally:
-
-1. Start the MongoDB service using Docker:
-   ```
-   docker-compose up mongo_db -d
-   ```
-
-   This uses the following Docker Compose configuration for MongoDB:
-
    ```yaml
-   services:
-     mongo_db:
-       container_name: mongo_db
-       restart: unless-stopped
-       image: mongo
-       volumes:
-         - mongo-data:/data/db
-         - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-       environment:
-         MONGO_INITDB_ROOT_USERNAME: username
-         MONGO_INITDB_ROOT_PASSWORD: password
-         MONGO_INITDB_DATABASE: db_name
-       ports:
-         - "27017:27017"
-
-   volumes:
-     mongo-data:
+   git clone https://github.com/walidmeguenni/management_api.git
    ```
 
-2. Seed the database with initial data:
-   ```
-   npm run db:seed
-   ```
-
-3. In a new terminal, start the NestJS application:
-   ```
-   npm run start:dev
+2. Running the application using docker
+   ```yaml
+     docker compose up -d --build
    ```
 
-4. The API will be available at `http://localhost:8000`
+## Important Note
+Before opening the Swagger documentation, please wait around 30 seconds for the application to fully start and for the database migrations and seeds to complete.
 
-Note: This method uses Docker for the MongoDB service but runs the NestJS application directly on your host machine, which is useful for development.
+The following script is executed during the Docker build process:
 
-## API Endpoints
+```bash
+#!/bin/bash
+# Wait for Postgres to be ready
+echo "Waiting for Postgres..."
+sleep 10
 
-- `/api/v1/private/project` - CRUD operations for employees
+# Run migrations
+echo "Running migrations..."
+npx prisma migrate dev --name "init"
 
-For detailed API documentation, please refer to the `/api-docs` endpoint after starting the server.
+# Run seeds
+echo "Running seeds..."
+npm run seed
+
+# Build the application
+echo "Building the application..."
+npm run build
+
+# Start the application in production mode
+echo "Starting the application..."
+npm run start:prod
+```
 
 ## Swagger Documentation
 To access the Swagger panel use the following path:
-```yaml 
+```yaml
   http://localhost:8000/api-docs
 ```
+
 ## Credentials
 To access the API, use the following default credentials for authentication:
-### for admin
+### Store Owner
 ```yaml
-Email: john.doe@example.com
+Email: john_doe@example.com
 Password: password123
 ```
 
-### for investor
-```yaml
-Email: perer.gr@example.com
-Password: password123
-```
+### Guest User
+No credentials required for viewing products
+## API Endpoints
+
+### Product Management
+- `POST /api/v1/private/products` - Add a new product (store owner only)
+- `GET /api/v1/private/products` - View a list of all products (available to all users)
+- `PUT /api/v1/private/products/:id` - Edit product details (store owner only)
+- `DELETE /api/v1/private/products/:id` - Delete a product (store owner only)
+
+### User Authentication
+- `POST /api/v1/auth/register` - Register a new user
+- `POST /api/v1/auth/login` - Login with email and password
+
+### Product Filtering and Sorting
+- `GET /api/v1/private/products?category=category_name` - Filter products by category
+- `GET /api/v1/private/products?sort=price_asc` - Sort products by price ascending
+- `GET /api/v1/private/products?sort=price_desc` - Sort products by price descending
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
+
