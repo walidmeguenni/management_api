@@ -10,7 +10,7 @@ export class LoginAuthDto {
   email: string;
 
   @ApiProperty({
-    example: "StrongP@ssw0rd!",
+    example: "password123456",
     description: "The password for the user account",
   })
   @IsString()

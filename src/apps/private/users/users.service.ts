@@ -31,8 +31,12 @@ export class UsersService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, req: CustomRequest) {
     try {
+      const { userId, role } = req;
+      if (userId !== id && role !== Role.OWNER) {
+        throw new ConflictException("You are not authorized to view this user");
+      }
       const result = await this.prismaService.user.findUnique({
         where: {
           id: id,
@@ -118,8 +122,13 @@ export class UsersService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, req: CustomRequest) {
     try {
+      const { userId, role } = req;
+      if (userId !== id && role !== Role.OWNER) {
+        throw new ConflictException("You are not authorized to view this user");
+      }
+      
       const existingUser = await this.prismaService.user.findUnique({
         where: {
           id: id,

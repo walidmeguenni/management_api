@@ -5,15 +5,17 @@ import {
 } from "@nestjs/common";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
-import { PrismaService } from "../../../framework";
+import { CustomRequest, PrismaService } from "../../../framework";
 
 @Injectable()
 export class ProductService {
   constructor(private readonly prismaService: PrismaService) {}
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, req: CustomRequest) {
     try {
+      const { userId } = req;
+      console.log("userId", userId);
       const result = await this.prismaService.product.create({
-        data: createProductDto,
+        data: { ...createProductDto, user: { connect: { id: userId } } },
       });
       if (!result) {
         throw new InternalServerErrorException("Error in creating product");

@@ -54,8 +54,8 @@ export class UsersController {
   })
   @Roles(Role.OWNER, Role.USER)
   @UseGuards(RolesGuard)
-  async findOne(@Param("id") id: string) {
-    return await this.usersService.findOne(+id);
+  async findOne(@Param("id") id: string, @Req() req: CustomRequest) {
+    return await this.usersService.findOne(+id, req);
   }
 
   @Patch(":id")
@@ -89,7 +89,7 @@ export class UsersController {
   })
   @Roles(Role.OWNER, Role.USER)
   @UseGuards(RolesGuard)
-  async remove(@Param("id") id: string) {
-    return await this.usersService.remove(+id);
+  async remove(@Param("id") id: string, @Req() req: CustomRequest) {
+    return await this.usersService.remove(+id, req);
   }
 }

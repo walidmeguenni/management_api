@@ -13,7 +13,7 @@ export class RegisterAuthDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'StrongP@ssw0rd!', description: 'The password for the user account' })
+  @ApiProperty({ example: 'password123456', description: 'The password for the user account' })
   @IsString()
   @MinLength(8)
   @IsNotEmpty()

@@ -11,6 +11,7 @@ import {
   UploadedFile,
   UseGuards,
   Query,
+  Req,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -21,6 +22,7 @@ import { imageUploadOptions } from "../../../framework/utils";
 import { Roles } from "../../../framework/decorators/roles.decorator";
 import { Role } from "../../../framework/enums/role.enum";
 import { RolesGuard } from "../../public/auth/guard/auth.guard";
+import { CustomRequest } from "../../../framework";
 
 @ApiTags("Product")
 @ApiResponse({
@@ -51,12 +53,13 @@ export class ProductController {
   @UseGuards(RolesGuard)
   async create(
     @Body() createProductDto: CreateProductDto,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: CustomRequest
   ) {
     if (file) {
       createProductDto.image = `/uploads/${file.filename}`;
     }
-    return await this.productService.create(createProductDto);
+    return await this.productService.create(createProductDto, req);
   }
   
   @Get()
