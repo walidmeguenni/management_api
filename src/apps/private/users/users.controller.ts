@@ -7,6 +7,7 @@ import {
   Delete,
   HttpStatus,
   UseGuards,
+  Req,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -14,6 +15,7 @@ import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../../../framework/decorators/roles.decorator";
 import { RolesGuard } from "../../public/auth/guard/auth.guard";
 import { Role } from "../../../framework/enums/role.enum";
+import { CustomRequest } from "../../../framework";
 
 @ApiTags("Users")
 @ApiResponse({
@@ -72,8 +74,12 @@ export class UsersController {
   })
   @Roles(Role.USER, Role.OWNER)
   @UseGuards(RolesGuard)
-  async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(+id, updateUserDto);
+  async update(
+    @Param("id") id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: CustomRequest
+  ) {
+    return await this.usersService.update(+id, updateUserDto, req);
   }
 
   @Delete(":id")

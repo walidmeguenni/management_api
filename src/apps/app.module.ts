@@ -8,7 +8,7 @@ import {
 import { RouterModule } from "@nestjs/core";
 import { PublicModule } from "./public/public.module";
 import { PrivateModule } from "./private/private.module";
-import { JwtMiddleware } from "../framework/jwt/jwt.middleware";
+import { JwtMiddleware } from "../framework";
 
 @Module({
   imports: [

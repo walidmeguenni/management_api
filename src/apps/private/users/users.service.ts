@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { PrismaService } from "../../../framework/prisma/prisma.service";
+import { PrismaService, CustomRequest, Role } from "../../../framework";
 
 @Injectable()
 export class UsersService {
@@ -52,9 +52,18 @@ export class UsersService {
     }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    req: CustomRequest
+  ) {
     try {
       const { username, email, password } = updateUserDto;
+      const { userId } = req;
+
+      if (userId !== id || req.role !== Role.OWNER) {
+        throw new ConflictException("You are not authorized to update this user");
+      }
       const existingUser = await this.prismaService.user.findUnique({
         where: {
           id: id,
@@ -91,7 +100,7 @@ export class UsersService {
         const salt = bcrypt.genSaltSync(10);
         updateUserDto.password = bcrypt.hashSync(password, salt);
       }
-      
+
       const result = await this.prismaService.user.update({
         where: {
           id: id,

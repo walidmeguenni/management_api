@@ -1,8 +1,7 @@
-// roles.guard.ts
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '@prisma/client';
 import { Observable } from 'rxjs';
+import { Role } from '../../../../framework';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -17,6 +16,7 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     request.userId = user.userId; 
+    request.role = user.role;
     if (!user) {
       throw new UnauthorizedException('User not found');
     }

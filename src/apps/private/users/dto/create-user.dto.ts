@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, MinLength, IsEnum } from 'class-validator';
-import { Role } from '../../../../framework/enums/role.enum';
+import { IsString, IsEmail, MinLength } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'john_doe', description: 'The username of the user' })
