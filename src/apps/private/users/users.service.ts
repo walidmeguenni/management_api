@@ -59,9 +59,9 @@ export class UsersService {
   ) {
     try {
       const { username, email, password } = updateUserDto;
-      const { userId } = req;
-
-      if (userId !== id || req.role !== Role.OWNER) {
+      const { userId, role } = req;
+      
+      if (userId !== id && role !== Role.OWNER) {
         throw new ConflictException("You are not authorized to update this user");
       }
       const existingUser = await this.prismaService.user.findUnique({
