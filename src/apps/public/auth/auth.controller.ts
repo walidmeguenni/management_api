@@ -1,36 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { RegisterAuthDto } from './dto/register-auth.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LoginAuthDto } from './dto/login-auth.dto';
 
 @ApiTags('Auth')
+@ApiResponse({
+  status: HttpStatus.BAD_REQUEST,
+  description: "Bad request",
+})
+@ApiResponse({
+  status: HttpStatus.INTERNAL_SERVER_ERROR,
+  description: "Internal server error",
+})
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('register')
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: "The record has been successfully created.",
+  })
+  register(@Body() data: RegisterAuthDto) {
+    return this.authService.register(data);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Post('login')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "The record has been successfully fetched.",
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: "auth not found",
+  })
+  login(@Body() data: LoginAuthDto) {
+    return this.authService.login(data);
   }
 }
