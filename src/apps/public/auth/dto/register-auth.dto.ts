@@ -8,7 +8,7 @@ export class RegisterAuthDto {
   @IsNotEmpty()
   username: string;
 
-  @ApiProperty({ example: 'john.doe@example.com', description: 'The unique email address of the user' })
+  @ApiProperty({ example: 'john_doe@example.com', description: 'The unique email address of the user' })
   @IsEmail()
   @IsNotEmpty()
   email: string;

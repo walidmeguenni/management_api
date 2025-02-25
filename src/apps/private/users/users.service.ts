@@ -12,7 +12,16 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
   async findAll() {
     try {
-      const result = await this.prismaService.user.findMany();
+      const result = await this.prismaService.user.findMany({
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
       if (!result) {
         return {
           status: false,
@@ -40,6 +49,14 @@ export class UsersService {
       const result = await this.prismaService.user.findUnique({
         where: {
           id: id,
+        },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
       if (!result) {
@@ -110,6 +127,14 @@ export class UsersService {
           id: id,
         },
         data: updateUserDto,
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       });
       return {
         status: true,

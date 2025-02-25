@@ -33,6 +33,14 @@ export class AuthService {
           ...data,
           password: hashedPassword,
         },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       });
 
       return {
@@ -58,6 +66,7 @@ export class AuthService {
         throw new UnauthorizedException("Invalid credentials");
       }
 
+      const { password, ...userWithoutPassword } = user;
 
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
@@ -70,7 +79,7 @@ export class AuthService {
         message: "Login successful",
         data: {
           token,
-          user,
+          user: userWithoutPassword,
         },
       };
     } catch (error) {
