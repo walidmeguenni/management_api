@@ -58,7 +58,7 @@ npm run start:prod
 ## Swagger Documentation
 To access the Swagger panel use the following path:
 ```yaml
-  http://localhost:4000/api-docs
+  http://localhost:8000/api-docs
 ```
 
 ## Credentials
